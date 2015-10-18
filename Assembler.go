@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -39,9 +40,10 @@ func main() {
 		switch p.CommandType() {
 		case A_COMMAND:
 			output = "0"
-			//symbol := p.Symbol()
-			// if number-string then transform binary
-			// if symbol-table then transform address and transform binary
+			addr, _ := strconv.Atoi(p.Symbol())
+			// if numberlike string then transform binary
+			// if symbol then transform address and transform binary
+			output += int2bin(addr)
 
 			fmt.Fprintln(writer, output)
 		case C_COMMAND:
@@ -70,3 +72,15 @@ func main() {
 	}
 }
 
+// 15bit int -> 000 0000 0000 0000
+func int2bin(num int) string {
+	var bin string
+	for i:=1<<14; i>0; i=i>>1 {
+		if i & num != 0 {
+			bin += "1"
+		} else {
+			bin += "0"
+		}
+	}
+	return bin
+}
