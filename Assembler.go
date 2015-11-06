@@ -41,6 +41,7 @@ func main() {
 	symbolTable := scanSymbol(NewParser(scanner))
 
 	// 2nd loop, assemble
+	fp.Seek(0, 0); scanner = bufio.NewScanner(fp) //reset
 	ramAddr := 0x0010 // starts from 16
 	for p := NewParser(scanner); p.HasMoreCommands(); p.Advance() {
 		var output string
@@ -65,30 +66,27 @@ func main() {
 					ramAddr++
 				}
 			}
-
 			fmt.Fprintln(writer, output)
+
 		case C_COMMAND:
 			output = "111"
 			comp, err := CodeComp(p.Comp())
 			if err != nil {
-				fmt.Println("Err1")
 				os.Exit(5)
 			}
 			output += comp
 			dest, err := CodeDest(p.Dest())
 			if err != nil {
-				fmt.Println("Err2")
 				os.Exit(5)
 			}
 			output += dest
 			jump, err := CodeJump(p.Jump())
 			if err != nil {
-				fmt.Println("Err3")
 				os.Exit(5)
 			}
 			output += jump
-
 			fmt.Fprintln(writer, output)
+
 		case L_COMMAND:
 			// do nothing
 		}
@@ -111,14 +109,14 @@ func int2bin(num int) string {
 
 func scanSymbol(p *Parser) SymbolTable {
 	st := NewSymbolTable()
-	romaddr := 0
+	romAddr := 0
 
 	for ; p.HasMoreCommands(); p.Advance() {
 		switch p.CommandType() {
 		case A_COMMAND, C_COMMAND:
-			romaddr++
+			romAddr++
 		case L_COMMAND:
-			st.AddEntry(p.Symbol(), romaddr + 1)
+			st.AddEntry(p.Symbol(), romAddr)
 		}
 	}
 
