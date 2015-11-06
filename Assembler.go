@@ -43,7 +43,9 @@ func main() {
 	// 2nd loop, assemble
 	fp.Seek(0, 0); scanner = bufio.NewScanner(fp) //reset
 	ramAddr := 0x0010 // starts from 16
-	for p := NewParser(scanner); p.HasMoreCommands(); p.Advance() {
+	p := NewParser(scanner)
+	for p.HasMoreCommands() {
+		p.Advance()
 		var output string
 		switch p.CommandType() {
 		case A_COMMAND:
@@ -111,7 +113,8 @@ func scanSymbol(p *Parser) SymbolTable {
 	st := NewSymbolTable()
 	romAddr := 0
 
-	for ; p.HasMoreCommands(); p.Advance() {
+	for p.HasMoreCommands() {
+		p.Advance()
 		switch p.CommandType() {
 		case A_COMMAND, C_COMMAND:
 			romAddr++
